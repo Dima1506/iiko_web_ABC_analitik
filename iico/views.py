@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 
 
 def index(request):
-  return render(request, 'index.html')
+  return render(request, 'index.html', {'state':85})
 
 def post(request):
   if request.method == 'POST':

@@ -52,17 +52,20 @@ $(document).ready(function () {
         calculation();
     });
 
-    function calculation() {
-        var xhr = new XMLHttpRequest();
-        var Other2 = parseFloat($("#Other").val());
-        var AC2 = parseFloat($("#AC").val());//Бюджет на привлечение когорты: десерт покупателю + 50 руб за каждую установку - продавцу
-        var RC2 = parseFloat($("#RC").val());
+    addEventListener("mouseup", function() {
+      var xhr = new XMLHttpRequest();
+      var Other2 = parseFloat($("#Other").val());
+      var AC2 = parseFloat($("#AC").val());//Бюджет на привлечение когорты: десерт покупателю + 50 руб за каждую установку - продавцу
+      var RC2 = parseFloat($("#RC").val());
         // 2. Конфигурируем его: GET-запрос на URL 'phones.json'
-        xhr.open('POST', 'update/', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        var body = 'name=' + Other2 + '&csrfmiddlewaretoken=' + csrf_token+ '&name1=' + AC2+ '&name2=' + RC2
+      xhr.open('POST', 'update/', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      var body = 'id='+state+'&name=' + Other2 + '&csrfmiddlewaretoken=' + csrf_token+ '&name1=' + AC2+ '&name2=' + RC2
         // 3. Отсылаем запрос
-        xhr.send(body);
+      xhr.send(body);
+    });
+
+    function calculation() {
 
         var UA = parseFloat($("#UA").val());//Число подписчиков чатбота, которые конвертируются в покупателей
         var C1 = parseFloat($("#C1").val());//Конверсия подписчиков чатбота в Покупателей в %

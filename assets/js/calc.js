@@ -7,15 +7,9 @@ $(document).ready(function () {
     calculation();
 
     /*Расчет цен по ползункам*/
+    
     $("#Other").on("input", function () {
         $("#Other_INFO").html($(this).val() + " рублей");
-        var xhr = new XMLHttpRequest();
-
-        // 2. Конфигурируем его: GET-запрос на URL 'phones.json'
-        xhr.open('GET', 'http://85.143.222.116:8000/update/', false);
-
-        // 3. Отсылаем запрос
-        xhr.send();
         calculation();
     });
 
@@ -58,7 +52,21 @@ $(document).ready(function () {
         calculation();
     });
 
+    addEventListener("mouseup", function() {
+      var xhr = new XMLHttpRequest();
+      var Other2 = parseFloat($("#Other").val());
+      var AC2 = parseFloat($("#AC").val());//Бюджет на привлечение когорты: десерт покупателю + 50 руб за каждую установку - продавцу
+      var RC2 = parseFloat($("#RC").val());
+        // 2. Конфигурируем его: GET-запрос на URL 'phones.json'
+      xhr.open('POST', 'update/', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      var body = 'id='+state+'&name=' + Other2 + '&csrfmiddlewaretoken=' + csrf_token+ '&name1=' + AC2+ '&name2=' + RC2
+        // 3. Отсылаем запрос
+      xhr.send(body);
+    });
+
     function calculation() {
+
         var UA = parseFloat($("#UA").val());//Число подписчиков чатбота, которые конвертируются в покупателей
         var C1 = parseFloat($("#C1").val());//Конверсия подписчиков чатбота в Покупателей в %
         var buyers = UA * C1;//Количество покупателей, с чатботом
