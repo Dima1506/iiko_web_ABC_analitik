@@ -79,8 +79,11 @@ WSGI_APPLICATION = 'iico.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'iiko',
+        'USER':  'django',
+        'PASSWORD': 'cxzaq15061999',
+        'HOST': 'localhost',
     }
 }
 

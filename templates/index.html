@@ -1,65 +1,195 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!doctype html>
+	<html lang="en">
+	<head>
+	    <!-- Required meta tags -->
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    {% load staticfiles %}
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	    <!-- Bootstrap CSS -->
+	    {% load staticfiles %}
+	    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
-    <title>Unit экономика</title>
-</head>
-<body>
-<div class="container">
-    <br>
-    <h1>Unit экономика</h1>
-    <br>
-    <div class="row justify-content-md-center">
-        <div class="col-lg-8">
-            <form>
-                <div class="form-group">
-                    <label for="Other">Стоимость затрат на обеспечение продажи</label>
-                    <input class="form-control-range" type="range" id="Other" name="volume" min="1" max="1000" value="100">
-                    <small id="Other_INFO" class="form-text text-muted"></small>
-                </div>
-                <div class="form-group">
-                    <label for="AC">Бюджет на привлечение когорты</label>
-                    <input class="form-control-range" type="range" id="AC" name="volume" min="1" max="25000" value="2000">
-                    <small id="AC_INFO" class="form-text text-muted"></small>
-                </div>
-                <div class="form-group">
-                    <label for="RC">Бюджет на удержание клиентов</label>
-                    <input class="form-control-range" type="range" id="RC" name="volume" min="1" max="25000" value="2000">
-                    <small id="RC_INFO" class="form-text text-muted"></small>
-                </div>
-            </form>
-            <hr>
-            <h3>Результаты:</h3>
-            <p>Затраты на привлечение одного подписчика, установившего чатбота: <strong id="CPA"></strong> рублей</p>
-            <p>Средние затраты на удержание подписчика чат-бота: <strong id="ARC"></strong> рублей</p>
-            <p>Прибыль с одного уникального подписчика чатбота: <strong id="ARPU_CPA_ARC"></strong> рублей</p>
-            <p>Прибыль,  которую мы получаем в когорте.: <strong id="Revenue"></strong> рублей</p>
-            <p>ROI: <strong id="ROI"></strong> %</p>
-        </div>
-    </div>
-</div>
+	    <title>Автомаркетинг</title>
+	</head>
+	<body>
+	<div class="container">
+	    <br>
+	    <h1><center>Автомаркетинг</center></h1>
+	    <br>
+	    <div class="row justify-content-md-center">
+	        <div class="col-lg-8">
+	            <form>
+	                <div class="form-group">
+	                    <label for="Other">Стоимость затрат на обеспечение продажи</label>
+	                    <input class="form-control-range" type="range" id="Other" name="volume" min="1" max="1000" value="50">
+	                    <small id="Other_INFO" class="form-text text-muted"></small>
+	                </div>
+	                <div class="form-group">
+	                    <label for="AC">Бюджет на привлечение в регистрацию в программе лояльности(ПЛ)</label>
+	                    <input class="form-control-range" type="range" id="AC" name="volume" min="1" max="25000" value="2000">
+	                    <small id="AC_INFO" class="form-text text-muted"></small>
+	                </div>
+	                <div class="form-group">
+	                    <label for="RC">Бюджет на удержание клиентов (Клиент - тот, кто сделал больше одной покупки)</label>
+	                    <input class="form-control-range" type="range" id="RC" name="volume" min="1" max="25000" value="2000">
+	                    <small id="RC_INFO" class="form-text text-muted"></small>
+	                </div>
+	                <center>
+	            </form>
+	            <br>
+	            <form>
+	              <table>
+	              <tr><td><h1><center>Акция</center></h1></td></tr>
+	              <tr>
+	              	<td>
+	              	<select name="select2" id ="sel3" onchange="f3()">
+	                  <option selected="selected" >Выберите скидку на продукт 2</option>
+	                  <option>10%</option>
+	                  <option>15%</option>
+	                  <option>20%</option>
+	                  </select>
+	                </td>
+
+	              </tr>
+	       </table>
+	        </form>
+
+	    </center>
+	        <form>
+	        	<table>
+	              <tr>
+	              	<td>
+	              	<p>
+	              	</td>
+	              </tr>
+	                <tr>
+	                <td>
+	                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	                </td>
+	                <td>
+	                <select name="select2" id ="sel1" onchange="f()">
+	                  <option selected="selected" >Выберите продукт 1</option>
+	                  {% for line in lines %} <option>{{ line }}</option>
+	                  {% endfor %}
+	                  </select>
+	                </td>
+	                <td>
+	                <strong>+</strong>
+	            	</td>
+	                </tr>
+	                <tr>
+	                <td>
+	                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	                </td>
+	                <td>
+	                <center ><p style="display:inline-block;" id="cost2"></p><p style="display:inline-block;">&nbsp;руб.</p></center>
+	            	</td>
+	                </tr>
+	            </table>
+	        </form>
+	        <center>
+	        <form>
+	            <table>
+	                <tr>
+	                <td>
+	                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	                </td>
+	                  <td>
+	                  <select name="select2" id ="sel2" onchange="f2()">
+	                  <option selected="selected" >Выберите продукт 2</option>
+	                  {% for line in lines2 %} <option>{{ line }}</option>
+	                  {% endfor %}
+	                  </select>
+	                  <td>
+	                <td>=</td>
+	                <td><del style="display:inline-block;" id="cost1"></del><del style="display:inline-block;">&nbsp;руб.</del></td>
+	                </tr>
+	                <tr>
+	                  <td>
+	                	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	                </td>
+	                  <td>
+	                  	<center ><p style="display:inline-block;" id="cost3"></p><p style="display:inline-block;">&nbsp;руб.</p></center>
+	                  <td>
+	                  <td></td>
+	                  <td><center ><strong style="display:inline-block;font-size: 28px;" id="cost4"></strong><strong style="display:inline-block;font-size: 28px;">&nbsp;руб.</strong></center></td>
+	                </td>
+	              </table>
+	            </form>
+	            </center>
+	            <hr>
+	            <h3>Результаты:</h3>
+	            <p>Затраты на привлечение одного человека, зарегистрировавшегося в ПЛ: <strong id="CPA"></strong> рублей</p>
+	            <p>Затраты на удержание одного клиента: <strong id="ARC"></strong> рублей</p>
+	            <p>Прибыль с одного человека, зарегистрировавшегося в ПЛ: <strong id="ARPU_CPA_ARC"></strong> рублей</p>
+	            <p>Прибыль, которую получаем в когорте ( Когорта - группа людей, зарегистрировавшаяся в ПЛ в определенный временной интервал, благодаря определенному маркетинговому предложению): <strong id="Revenue"></strong> рублей</p>
+	            <p>ROI: <strong id="ROI"></strong> %</p>
+	        </div>
+	    </div>
+	</div>
 
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-<script type="text/javascript">
-  var csrf_token = '{{ csrf_token }}';
-  var state = '{{state}}'
-</script>
-{% load staticfiles %}
-<script src="{% static 'js/bootstrap.min.js' %}"></script>
-{% block extrahead %}
-<script src='static/js/calc.js'></script>
-{% endblock extrahead %}
-</body>
-</html>
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+	        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+	        crossorigin="anonymous"></script>
+	<script type="text/javascript">
+	  var state = '{{state}}'
+	  var cost_1 = 0;
+	  var cost_2 = 0;
+	  var cost_4 = cost_1 + cost_2;
+	  var cost_5 = 0.1;
+	  var cost_3 = cost_4*(1-cost_5);
+	  document.getElementById("cost2").innerHTML = cost_1.toFixed(2);
+	  document.getElementById("cost1").innerHTML = cost_3.toFixed(2);
+	  document.getElementById("cost3").innerHTML = cost_2.toFixed(2);
+	  document.getElementById("cost4").innerHTML = cost_4.toFixed(2);
+	  function f(){
+	    cost_1=document.getElementById('sel1').options.selectedIndex;
+	    var array = JSON.parse("[" + cost1 + "]");
+	    cost_1 = array[0][cost_1-1]
+	    cost_4 = cost_1 + cost_2;
+	    cost_3 = cost_1 + cost_2*0.7;
+	    document.getElementById("cost2").innerHTML = cost_1.toFixed(2);
+	    document.getElementById("cost1").innerHTML = cost_4.toFixed(2);
+	    document.getElementById("cost4").innerHTML = cost_3.toFixed(2);
+	  }
+	  function f2(){
+	    cost_2=document.getElementById('sel2').options.selectedIndex;
+	    var array = JSON.parse("[" + cost2 + "]");
+	    cost_2 = array[0][cost_2-1]
+	    cost_4 = cost_1 + cost_2;
+	    cost_3 = cost_1 + cost_2*0.7;
+	    document.getElementById("cost1").innerHTML = cost_4.toFixed(2);
+	    document.getElementById("cost3").innerHTML = cost_2.toFixed(2);
+	    document.getElementById("cost4").innerHTML = cost_3.toFixed(2);
+	  }
+	  function f3(){
+	    var p=document.getElementById('sel3').options.selectedIndex;
+	    console.log(p)
+	    cost_5 = 0.05 + 0.05*p;
+	    console.log(cost_5)
+	    cost_3 = cost_1 + cost_2*(1-cost_5);
+	    document.getElementById("cost4").innerHTML = cost_3.toFixed(2);
+	  }
+	  addEventListener("onchange", f)
+	  addEventListener("onchange", f2)
+	  addEventListener("onchange", f3)
+	  var csrf_token = '{{ csrf_token }}';
+	  
+	  var cpa = '{{CPA}}'
+	  var arc = '{{ARC}}'
+	  var arpu_cpa_arc = '{{ARPU_CPA_ARC}}'
+	  var revenue = '{{Revenue}}'
+	  var roi = '{{ROI}}'
+	  var cost1 = '{{cost1}}'
+	  var cost2 = '{{cost2}}'
+	</script>
+	{% load staticfiles %}
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	{% block extrahead %}
+	<script src="{% static 'js/calc.js' %}"></script>
+	{% endblock extrahead %}
+	</body>
+	</html>
