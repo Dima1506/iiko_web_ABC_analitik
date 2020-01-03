@@ -28,7 +28,7 @@
 				<span class="login100-form-title p-b-41">
 					Войти в Аккаунт
 				</span>
-				<form class="login100-form validate-form p-b-33 p-t-5" action="http://85.143.222.116:8000/signin/" method="POST" name="form">
+				<form class="login100-form validate-form p-b-33 p-t-5" action="/signin/" method="POST" name="form">
 					<p>{% csrf_token %}</p>
 					<div class="wrap-input100 validate-input" data-validate = "Enter server">
 						<input class="input100" type="text" name="server" placeholder="Server">
@@ -55,13 +55,6 @@
 			</div>
 		</div>
 	</div>
-	
-
-	<div id="dropDownSelect1"></div>
-	
-<!--===============================================================================================-->
-
-<!--===============================================================================================-->
 	<script src="static/js/main.js"></script>
 
 </body>

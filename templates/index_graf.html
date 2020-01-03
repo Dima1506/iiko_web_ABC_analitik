@@ -1,0 +1,224 @@
+	<!doctype html>
+	<html lang="en">
+	<head>
+	    <!-- Required meta tags -->
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	    <!-- Bootstrap CSS -->
+	    {% load staticfiles %}
+	    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+	  	 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+	    </style>
+	    <title>Графики</title>
+	</head>
+	<body>
+	<div>
+	
+	<nav class="navbar   navbar-expand-lg  navbar-light bg-light">
+  	
+  
+    <ul class="nav navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link disabled" href="#">Mr IIKO</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/plat">Калькулятор маркетинга</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/graf">Графики</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Личный кабинет</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/login">Выход</a>
+      </li>
+    </ul>
+</nav>
+</div>
+	<div class="container">
+		  
+
+	  	
+	    <br>
+	    <h1><center>Графики</center></h1>
+	    <br>
+	    
+	    <div class="row justify-content-center">
+	        <div id="curve_chart" style="width: 1200px; height: 500px"></div>
+          <div id="curve_chart2" style="width: 1200px; height: 500px"></div>
+          <div id="curve_chart5" style="width: 1200px; height: 500px"></div>
+	    </div>
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+	        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+	        crossorigin="anonymous"></script>
+	 <script type="text/javascript">
+	  var xhr = new XMLHttpRequest();
+        // 2. Конфигурируем его: GET-запрос на URL 'phones.json'
+      
+        // 3. Отсылаем запрос
+      xhr.open('GET', '/graf_p/', false);
+      xhr.send();
+      console.log(xhr.status);
+      console.log(xhr.responseText);
+      console.log(typeof(xhr.response));
+      var cf = JSON.parse(xhr.response);
+      console.log(cf);
+      console.log(typeof(cf));
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart2);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart3);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart3);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart4);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart5);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart6);
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart7);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(cf[0]);
+
+        var options = {
+          title: 'Количество новых покупателей',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+      function drawChart2() {
+        var data = google.visualization.arrayToDataTable(cf[2]);
+
+        var options = {
+          title: 'Количество новых клиентов',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart2'));
+
+        chart.draw(data, options);
+      }
+      function drawChart3() {
+        var data = google.visualization.arrayToDataTable([
+          ['Неделя', 'Sales'],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030]
+        ]);
+
+        var options = {
+          title: 'Затраты на привлечение одного человека, зарегистрировавшегося в ПЛ',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart3'));
+
+        chart.draw(data, options);
+      }
+      function drawChart4() {
+        var data = google.visualization.arrayToDataTable([
+          ['Неделя', 'Sales'],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030]
+        ]);
+
+        var options = {
+          title: 'Затраты на удержание одного клиента',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart4'));
+
+        chart.draw(data, options);
+      }
+      function drawChart5() {
+        var data = google.visualization.arrayToDataTable(cf[1]);
+
+        var options = {
+          title: 'Количество проданных офферов - акций ( паровоз + вагоны) ',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart5'));
+
+        chart.draw(data, options);
+      }
+      function drawChart6() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales'],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030]
+        ]);
+
+        var options = {
+          title: 'Прибыль на одного человека, зарегистрировавшегося в ПЛ',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart6'));
+
+        chart.draw(data, options);
+      }
+      function drawChart7() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales'],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030],
+          ['2004',  1000],
+          ['2005',  1170],
+          ['2006',  660],
+          ['2007',  1030]
+        ]);
+
+        var options = {
+          title: 'Прибыль, которую получаем в когорте ',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart7'));
+
+        chart.draw(data, options);
+      }
+    </script>
+	{% load staticfiles %}
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	</body>
+	</html>

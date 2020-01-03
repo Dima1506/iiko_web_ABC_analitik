@@ -1,0 +1,35 @@
+/* Фиксированный боковых навигационных ссылок, полной высоты */
+.sidenav {
+  height: 100%;
+  width: 18%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 1;
+  background-color: #111;
+  overflow-x: hidden;
+}
+
+
+
+/* Стиль боковых навигационных ссылок и раскрывающейся кнопки */
+.sidenav a, .dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+  border: none;
+  background: none;
+  width:100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+/* При наведении курсора мыши */
+.sidenav a:hover, .dropdown-btn:hover {
+  color: #f1f1f1;
+}
+
+/* Основное содержание */

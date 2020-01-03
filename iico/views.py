@@ -33,33 +33,45 @@ def isLoginBiz(login,password):
         url = "https://iiko.biz:9900/api/0/auth/access_token?user_id="+login+"&user_secret="+password
         token = requests.get(url).text
         token = token[1:len(token)-1]
+        print(len(token))
         #print(url)
-        #print(token)
+        print(token)
     except Exception:
         return '0'
-    if len(token.split('-')[0]) != 87:
+    if len(token) != 87:
         return '0'
     return str(token)
 
 def datadelta():
     now = datetime.now()
     change_pyt = now.weekday() - 4
+    #print(change_pyt)
     if change_pyt<0:
         change_pyt+=7
     #print(change_pyt)
     del_days = timedelta(change_pyt)
     #print(del_days)
-    now = now -del_days                            
+    now = now -del_days
+    #print(now)                            
     seven_days = timedelta(7)  
     to_seven_days = now - seven_days
-    now_str = str(now.year)+'-'+str(now.month) + '-'
-    str_seven_days = str(to_seven_days.year)+'-'+str(to_seven_days.month) + '-'
+    now_str = str(now.year)+'-'
+    str_seven_days = str(to_seven_days.year)+'-'
+    if now.month<10:
+    	now_str=now_str+"0"
+    	print(now_str)
+    if to_seven_days.month<10:
+    	str_seven_days=str_seven_days+"0"
+    now_str = now_str+str(now.month) + '-'
+    str_seven_days = str_seven_days +str(to_seven_days.month) + '-'
     if now.day<10:
     	now_str=now_str+"0"
     if to_seven_days.day<10:
     	str_seven_days=str_seven_days+"0"
     now_str=now_str+str(now.day)
     str_seven_days=str_seven_days+str(to_seven_days.day)
+    print(str_seven_days)
+    print(now_str)
     return [now_str, str_seven_days, now, to_seven_days]   
 
 def get_info_iiko(server_name):
@@ -69,12 +81,12 @@ def get_info_iiko(server_name):
     now_str = str(now.day)+'.'+str(now.month) + '.'+ str(now.year)
     str_seven_days = str(to_seven_days.day)+'.'+str(to_seven_days.month) + '.'+str(to_seven_days.year)
     deltadata = [now_str,str_seven_days]
-    print(deltadata)
+    #print(deltadata)
     table = db['user']
     row = table.find_one(id=server_name)
     url_zapr = 'http://'+str(server_name)+':8080/resto/api/reports/olap?key='+str(row['token'])+'&report=SALES&from='+str(deltadata[1])+'&to='+str(deltadata[0])+'&agr=fullSum&agr=OrderNum&agr=ProductCostBase.ProductCost&agr=DishAmountInt&agr=GuestNum.Avg&groupRow=Delivery.IsDelivery&agr=DishDiscountSumInt.averagePrice'
     text_zapr= requests.get(url_zapr, headers={'Content-Type':'text/xml'}).text
-    print(text_zapr)
+    #print(text_zapr)
     if text_zapr == 'Token is expired or invalid':
         token = isLogin(server_name,str(row['login']),str(row['pass']))
         data_token = dict(id=server_name, token=token)
@@ -82,20 +94,19 @@ def get_info_iiko(server_name):
         url_zapr = 'http://'+str(server_name)+':8080/resto/api/reports/olap?key='+str(row['token'])+'&report=SALES&from='+deltadata[1]+'&to='+deltadata[0]+'&agr=fullSum&agr=OrderNum&agr=ProductCostBase.ProductCost&agr=DishAmountInt&agr=GuestNum.Avg&groupRow=Delivery.IsDelivery&agr=DishDiscountSumInt.averagePrice'
         text_zapr= requests.get(url_zapr, headers={'Content-Type':'text/xml'}).text
 
-    
-
     xml_parse = xmltodict.parse(text_zapr)
     AGPrice = xml_parse['report']['r']['DishDiscountSumInt.averagePrice']
     AGCount = float(xml_parse['report']['r']['DishAmountInt'])*1.0 / float(xml_parse['report']['r']['OrderNum'])
     NetCost = float(xml_parse['report']['r']['ProductCostBase.ProductCost']) *1.0 / float(xml_parse['report']['r']['OrderNum'])
-    data_unit = dict(id=server_name, AGPrice=AGPrice,AGCount=AGCount, NetCost = NetCost)
-    table.update(data_unit, ['id'])
+    return [float(AGPrice), float(AGCount),float(NetCost)]
 
 
 def calc(server_name):
+
   deltadata = datadelta()
   table = db['user']
   row = table.find_one(id=server_name)
+  print("sdfds")
   url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(row['token'])
   data = {
     "reportType": "SALES",
@@ -119,7 +130,6 @@ def calc(server_name):
     }
   }
   
-  
   text_abc = requests.post(url_abc, json = data)
   if text_abc.text == 'Token is expired or invalid':
     token = isLogin(server_name,str(row['login']),str(row['pass']))
@@ -130,7 +140,6 @@ def calc(server_name):
   infor_abc =  text_abc.json()
 
   tech_p = {}
-
   summa = {'marsa':0, 'vol':0}
   
   for ip in infor_abc['summary']:
@@ -148,7 +157,6 @@ def calc(server_name):
       #print("lol")
       #tech_p['NotInfo'] = [ip[1]['fullSum'] - ip[1]['ProductCostBase.ProductCost'], ((ip[1]['fullSum'] - ip[1]['ProductCostBase.ProductCost'])*100.0/ip[1]['fullSum']),ip[1]['DishAmountInt']]
   
-
 
   list_d = list(tech_p.items())
   list_d.sort(reverse = True, key=lambda i: i[1][0])
@@ -211,15 +219,160 @@ def calc(server_name):
   return [lines, lines2, lines3,lines4]
 
 
-def convers_user(server_name):
+def combo_skidka(server_name, date1,date2):
+    deltadata = datadelta()
+    table = db['user']
+    row = table.find_one(id=server_name)
+    url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(row['token'])
+    data = {
+      "reportType": "SALES",
+      "groupByRowFields": [],
+      "groupByColFields": [],
+      "aggregateFields": [
+        "ItemSaleEventDiscountType.ComboAmount"
+      ],
+      "filters": {
+        "OpenDate.Typed": {
+          "filterType": "DateRange",
+          "periodType": "CUSTOM",
+          "from": date2 + "T00:00:00.000",
+          "to": date1 + "T00:00:00.000",
+          "includeLow": 'true',
+          "includeHigh": 'false'
+        }
+      }
+    }
+    
+    text_abc = requests.post(url_abc, json = data)
+    if text_abc.text == 'Token is expired or invalid':
+      token = isLogin(server_name,str(row['login']),str(row['pass']))
+      data_token = dict(id=server_name, token=token)
+      table.update(data_token, ['id'])
+      url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(token)
+      text_abc = requests.post(url_abc, json = data)
+    return int(text_abc.json()['data'][0]['ItemSaleEventDiscountType.ComboAmount'])
+
+def convers_user2(server_name, date1,date2,date_p1,date_p2):
+	#deltadata = datadelta()
+	table = db['user']
+	row = table.find_one(id=server_name)
+	url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(row['token'])
+	data = {
+		"reportType": "SALES",
+		"groupByRowFields": [],
+		"groupByColFields": ["Delivery.CustomerCardNumber","Delivery.CustomerCreatedDateTyped"],
+		"aggregateFields": [
+		"GuestNum"
+	],
+	"filters": {
+		"OpenDate.Typed": {
+		"filterType": "DateRange",
+		"periodType": "CUSTOM",
+		"from": date2 + "T00:00:00.000",
+		"to": date1 + "T00:00:00.000",
+		"includeLow": 'true',
+		"includeHigh": 'false'
+		}
+	}
+	}
+    
+	text_abc = requests.post(url_abc, json = data)
+	#print(text_abc.text)
+	if text_abc.text == 'Token is expired or invalid':
+		token = isLogin(server_name,str(row['login']),str(row['pass']))
+		data_token = dict(id=server_name, token=token)
+		table.update(data_token, ['id'])
+		url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(token)
+		text_abc = requests.post(url_abc, json = data)
+	#print(text_abc.json())
+	summa_avc = 0
+	vol_guestc= 0
+	all_guestc = 0
+	now = date_p1
+	to_seven_days = date_p2
+	for guest in text_abc.json()['data']:
+		if (guest['Delivery.CustomerCardNumber'] != None):
+			data_sozd = guest['Delivery.CustomerCreatedDateTyped']
+			data_sozd  = datetime.strptime(data_sozd+"-12:30","%Y-%m-%d-%I:%M")
+			if (data_sozd<now) and (data_sozd>to_seven_days):
+				print(guest)
+				summa_avc = summa_avc + guest['GuestNum']
+				all_guestc +=1
+				if guest['GuestNum']!=0:
+					vol_guestc+=1
+	return [all_guestc,vol_guestc,summa_avc]
+
+
+def client(server_name, date1,date2,date_p1,date_p2):
+	#deltadata = datadelta()
+	table = db['user']
+	row = table.find_one(id=server_name)
+	url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(row['token'])
+	data = {
+		"reportType": "SALES",
+		"groupByRowFields": [],
+		"groupByColFields": ["Delivery.CustomerCardNumber","Delivery.CustomerCreatedDateTyped"],
+		"aggregateFields": [
+		"GuestNum"
+	],
+	"filters": {
+		"OpenDate.Typed": {
+		"filterType": "DateRange",
+		"periodType": "CUSTOM",
+		"from": date2 + "T00:00:00.000",
+		"to": date1 + "T00:00:00.000",
+		"includeLow": 'true',
+		"includeHigh": 'false'
+		}
+	}
+	}
+    
+	text_abc = requests.post(url_abc, json = data)
+	if text_abc.text == 'Token is expired or invalid':
+		token = isLogin(server_name,str(row['login']),str(row['pass']))
+		data_token = dict(id=server_name, token=token)
+		table.update(data_token, ['id'])
+		url_abc = 'http://'+str(server_name)+':8080/resto/api/v2/reports/olap?&key='+str(token)
+		text_abc = requests.post(url_abc, json = data)
+	#print(text_abc.json())
+	clients = 0
+	now = date_p2+timedelta(7)
+	to_seven_days = date_p2
+	for guest in text_abc.json()['data']:
+		print(to_seven_days)
+		if (guest['Delivery.CustomerCardNumber'] != None):
+			data_sozd = guest['Delivery.CustomerCreatedDateTyped']
+			data_sozd  = datetime.strptime(data_sozd+"-12:30","%Y-%m-%d-%I:%M")
+			print(guest)
+			if (data_sozd<now) and (data_sozd>to_seven_days):
+				if guest['GuestNum']>1:
+					clients+=1
+	return clients
+
+
+
+
+def convers_user(server_name, date1,date2):
     table = db['user']
     row = table.find_one(id=server_name)
     token  = row['token_biz']
-    r = requests.get("https://iiko.biz:9900//api/0/organization/list?access_token="+token)
-    organisation_id = json.loads(r.text)[0]['id']
+    r = requests.get("https://iiko.biz:9900/api/0/organization/list?access_token="+token).text
+    print(r.split(",")[0])
+    if r.split(",")[0] =='{"code":null':
+        print("DSFs")
+        token = isLoginBiz(row['login_biz'],row['pass_biz'])
+        print(token)
+        r = requests.get("https://iiko.biz:9900/api/0/organization/list?access_token="+token).text
+        data = dict(id=server_name, token_biz=token)
+        table.update(data, ['id'])
+    organisation_id = json.loads(r)[0]['id']
     deltadata = datadelta()
-    r = requests.get("https://iiko.biz:9900/api/0/customers/get_customers_by_organization_and_by_period?access_token="+token+"&organization="+organisation_id+"&dateFrom="+str(deltadata[1])+"&dateTo="+str(deltadata[0]))
-    #print(r.text)
+    
+    url_P = ("https://iiko.biz:9900/api/0/customers/get_customers_by_organization_and_by_period?access_token="+token+"&organization="+organisation_id+"&dateFrom="+str(deltadata[1])+"&dateTo="+str(deltadata[0]))
+    print(url_P)
+    r = requests.get(url_P)
+    print("________________________")
+    print(r.text)
 
     infor_abc =  r.json()
     now = deltadata[2]
@@ -238,31 +391,33 @@ def convers_user(server_name):
                 t+=1
           except Exception:
             print("__")
-    return [t,t2]
+    return [t,t2,str(deltadata[0])]
 
 
 
 
 def unit_calc(server_name, Other=50,AC = 2000, RC = 2000):
-    
-    buyers = get_info_iiko(server_name)
-    user_buy, user_all = convers_user(server_name)
-
-    table = db['user']
-    row = table.find_one(id=server_name)
+    now, seven_days, now_p, seven_days_p = datadelta()
+    print(now)
+    print(seven_days)
+    AGPrice,AGCount,NetCost = get_info_iiko(server_name)
+    #user_buy, user_all, date = convers_user(server_name)
+    #user_combo=combo_skidka(server_name)
+    user_all, user_buy, vol_avc= convers_user2(server_name,now,seven_days,now_p, seven_days_p)
+    table = db[str(server_name)]
     buyers = user_buy
     UA = user_all #Число подписчиков чатбота, которые конвертируются в покупателей
     try:
         C1 = user_buy*1.0/user_all  #Конверсия подписчиков чатбота в Покупателей в
     except ZeroDivisionError:
         C1 = 0
-    #buyers = UA * C1 #Количество покупателей, с чатботом
-    AGPrice = float(row['AGPrice']) #Средняя цена товара в магазине, который покупается клиентами
-    AGCount = float(row['AGCount'])#Среднее число товаров в корзине клиента
     AVPrice = AGPrice * AGCount #Средний чек в магазине
     
-    NetCost = float(row['NetCost'])#COGS себестоимость
-    APC = 5 #Среднее число приходов (в когорте) одним Покупателем, установившем чатбота
+    try:
+        APC = vol_avc*1.0/buyers #Затраты на привлечение одного подписчика, установившего чатбота
+    except ZeroDivisionError:
+        APC = 0
+     #Среднее число приходов (в когорте) одним Покупателем, установившем чатбота
     Delivery = 0 #= fdata[server_name]['Delivery']
     ARPPU = (AVPrice - (NetCost + Delivery + Other)) * APC #Доход с одного платящего клиента за время жизни когорты.
     
@@ -281,6 +436,9 @@ def unit_calc(server_name, Other=50,AC = 2000, RC = 2000):
     ARPU_CPA_ARC = ARPU - CPA - ARC #Прибыль с одного уникального подписчика чатбота
     Revenue = ARPU_CPA_ARC * UA #Прибыль,  которую мы получаем в когорте.
     ROI = (ARPPU * buyers - (AC + RC))/(AC + RC) * 100#ROI
+    #table.insert({'date': date, 'new_client':str(user_buy), 'new_client_to2':'0', 'vol_par':'0','cost_uder':str(ARC),'cost_priv':str(CPA), 'prib_1people':str(ARPU_CPA_ARC),'prib_kogort':str(Revenue)})
+    row = table.find_one(date="2019-11-29")
+    print(row)
     return [CPA, ARC, ARPU_CPA_ARC, Revenue, ROI]
 
 
@@ -328,7 +486,17 @@ def regin(request):
             table = db['user']
             row = table.find_one(id=server) 
             if row == None:
-                table.insert({'id':server, 'login':login, 'token':token, 'pass':password, 'token_biz':token2, 'login_biz':login_iiko, 'pass_biz':pass_iiko, 'AGPrice':0, 'NetCost':0, 'AGCount':0})
+                table.insert({'id':server, 'login':login, 'token':token, 'pass':password, 'token_biz':token2, 'login_biz':login_iiko, 'pass_biz':pass_iiko})
+                table3 = db.create_table(server,
+                         primary_id='date',
+                         primary_type=db.types.string(35))
+                table3.create_column('new_client', db.types.text)
+                table3.create_column('new_client_to2', db.types.text)
+                table3.create_column('vol_par', db.types.text)
+                table3.create_column('cost_uder', db.types.text)
+                table3.create_column('cost_priv', db.types.text)
+                table3.create_column('prib_1people', db.types.text)
+                table3.create_column('prib_kogort', db.types.text)
             data = dict(id=server, token=token)
             table.update(data, ['id'])
             request.session['server'] = str(server)
@@ -345,7 +513,10 @@ def index(request):
         return render(request, 'index_login.html')
 
 def reg(request):
-    return render(request, 'index_login2.html')
+    return render(request, 'index_login2.html')\
+
+def graf(request):
+    return render(request, 'index_graf.html')
 
 
 def index_login(request):
@@ -363,3 +534,109 @@ def bot_info(request):
     data = eval(file.read())
     file.close()
     print(request.POST)
+
+def graf_p(request):
+	print(request.session['server'])
+	now, seven_days, now_p, seven_days_p = datadelta()
+	array = []
+	vol1=[]
+	vol1.append(['Дата','Количество покупателей'])
+	#print([i for i in range(10, 1, -1)])
+	for i in range(10,0,-1):
+		del_seven_days = now_p-timedelta(7*i)
+		del2_seven_days = now_p-timedelta(7*(i-1))
+		now_str = str(del2_seven_days.year)+'-'
+		str_seven_days = str(del_seven_days.year)+'-'
+		if del2_seven_days.month<10:
+			now_str=now_str+"0"
+		if del_seven_days.month<10:
+			str_seven_days=str_seven_days+"0"
+		now_str = now_str+str(del2_seven_days.month) + '-'
+		str_seven_days = str_seven_days +str(del_seven_days.month) + '-'
+
+
+		#now_str = str(del2_seven_days.year)+'-'+str(del2_seven_days.month) + '-'
+		#str_seven_days = str(del_seven_days.year)+'-'+str(del_seven_days.month) + '-'
+
+		if del2_seven_days.day<10:
+			now_str=now_str+"0"
+		if del_seven_days.day<10:
+			str_seven_days=str_seven_days+"0"
+		now_str=now_str+str(del2_seven_days.day)
+		str_seven_days=str_seven_days+str(del_seven_days.day)
+		#print([now_str,str_seven_days])
+		vol_guests = convers_user2(request.session['server'],now_str,str_seven_days,del2_seven_days,del_seven_days)[1]
+		vol1.append([now_str, vol_guests])
+	print(vol1)
+	array.append(vol1)
+	vol1=[]
+	vol1.append(['Дата','Количество проданнх офферов'])
+	print([i for i in range(8, 0, -1)])
+	for i in range(10,0,-1):
+		del_seven_days = now_p-timedelta(7*i)
+		del2_seven_days = now_p-timedelta(7*(i-1))
+
+
+		now_str = str(del2_seven_days.year)+'-'
+		str_seven_days = str(del_seven_days.year)+'-'
+		if del2_seven_days.month<10:
+			now_str=now_str+"0"
+		if del_seven_days.month<10:
+			str_seven_days=str_seven_days+"0"
+		now_str = now_str+str(del2_seven_days.month) + '-'
+		str_seven_days = str_seven_days +str(del_seven_days.month) + '-'
+
+		#now_str = str(del2_seven_days.year)+'-'+str(del2_seven_days.month) + '-'
+		#str_seven_days = str(del_seven_days.year)+'-'+str(del_seven_days.month) + '-'
+
+		if del2_seven_days.day<10:
+			now_str=now_str+"0"
+		if del_seven_days.day<10:
+			str_seven_days=str_seven_days+"0"
+		now_str=now_str+str(del2_seven_days.day)
+		str_seven_days=str_seven_days+str(del_seven_days.day)
+		#print([now_str,str_seven_days])
+		vol_guests = combo_skidka(request.session['server'],now_str,str_seven_days)
+		vol1.append([now_str, vol_guests])
+	print(vol1)
+	array.append(vol1)
+	vol1=[]
+	vol1.append(['Дата','Количество клиентов'])
+	#print([i for i in range(8, 1, -1)])
+	for i in range(10,0,-1):
+		del_seven_days = now_p-timedelta(7*i)
+		del2_seven_days = now_p
+		del3_seven_days = del_seven_days + timedelta(7)
+		now_str = str(del2_seven_days.year)+'-'
+		str_seven_days = str(del_seven_days.year)+'-'
+		str2_seven_days = str(del3_seven_days.year)+'-'
+		if del2_seven_days.month<10:
+			now_str=now_str+"0"
+		if del_seven_days.month<10:
+			str_seven_days=str_seven_days+"0"
+		if del3_seven_days.month<10:
+			str2_seven_days=str2_seven_days+"0"
+		now_str = now_str+str(del2_seven_days.month) + '-'
+		str_seven_days = str_seven_days +str(del_seven_days.month) + '-'
+		str2_seven_days = str2_seven_days +str(del3_seven_days.month) + '-'
+
+		#now_str = str(del2_seven_days.year)+'-'+str(del2_seven_days.month) + '-'
+		#str_seven_days = str(del_seven_days.year)+'-'+str(del_seven_days.month) + '-'
+
+
+		if del2_seven_days.day<10:
+			now_str=now_str+"0"
+		if del_seven_days.day<10:
+			str_seven_days=str_seven_days+"0"
+		if del3_seven_days.day<10:
+			str2_seven_days=str2_seven_days+"0"
+
+		now_str=now_str+str(del2_seven_days.day)
+		str_seven_days=str_seven_days+str(del_seven_days.day)
+		str2_seven_days=str2_seven_days+str(del3_seven_days.day)
+		#print([now_str,str_seven_days])
+		vol_guests = client(request.session['server'],now_str,str_seven_days,del2_seven_days,del_seven_days)
+		vol1.append([str2_seven_days, vol_guests])
+	#print(vol1)
+	array.append(vol1)
+	return HttpResponse(json.dumps(array), content_type="application/json")

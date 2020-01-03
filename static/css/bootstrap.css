@@ -3620,7 +3620,7 @@ tbody.collapse.show {
   }
 }
 
-@media (min-width: 576px) {
+@media (min-width: 20px) {
   .navbar-expand-sm {
     flex-flow: row nowrap;
     justify-content: flex-start;
