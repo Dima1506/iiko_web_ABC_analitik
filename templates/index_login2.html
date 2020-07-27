@@ -28,7 +28,7 @@
 				<span class="login100-form-title p-b-41">
 					Регистрация
 				</span>
-				<form class="login100-form validate-form p-b-33 p-t-5" action="http://85.143.222.116:8000/regin/" method="POST" name="form">
+				<form class="login100-form validate-form p-b-33 p-t-5" action="https://ruiiko.ru/regin/" method="POST" name="form">
 					<p>{% csrf_token %}</p>
 					<div class="wrap-input100 validate-input" data-validate = "Enter server">
 						<input class="input100" type="text" name="server" placeholder="Server">
@@ -45,13 +45,13 @@
 						<span class="focus-input100" data-placeholder="&#xe80f;"></span>
 					</div>
 
-					<div class="wrap-input100 validate-input" data-validate = "Enter username">
-						<input class="input100" type="text" name="login_biz" placeholder="Логин API IIKO BIZ">
-						<span class="focus-input100" data-placeholder="&#xe82a;"></span>
+					<div class="wrap-input100 validate-input" data-validate="Enter E-mail">
+						<input class="input100" autocomplete="on" type="login" name="email" placeholder="E-mail">
+						<span class="focus-input100" data-placeholder="&#xe80f;"></span>
 					</div>
 
-					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" autocomplete="on" type="password" name="pass_biz" placeholder="Пароль  API IIKO BIZ">
+					<div class="wrap-input100 validate-input" data-validate="Enter password user">
+						<input class="input100" autocomplete="on" type="password" name="pass2" placeholder="Пароль">
 						<span class="focus-input100" data-placeholder="&#xe80f;"></span>
 					</div>
 

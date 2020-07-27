@@ -451,42 +451,41 @@ def hex(password):
 
 def signin(request):
     if request.method == 'POST':
-        server = str(request.POST['server'])
-        login = request.POST['login']
+        #server = str(request.POST['server'])
+        table = db['user']
+        login = request.POST['email']
         password = hex(request.POST['pass'])
-        token = isLogin(server, login, password)
-        if token == '0':
+        user = table.find_one(email=login, pass2 = password)
+        print(user)
+        if user == None:
             return redirect('/login')
         else:
-            table = db['user']
-            row = table.find_one(id=server) 
-            data = dict(id=server, token=token)
+            token = isLogin(user['id'], user['login'], user['pass'])
+            data = dict(id=user['id'], token=token)
             table.update(data, ['id'])
-            request.session['server'] = str(server)
+            request.session['server'] = str(user['id'])
             print(request.session['server'])
             return redirect('/plat')
 
 def regin(request):
     if request.method == 'POST':
+        #print("sada")
         server = str(request.POST['server'])
         login = request.POST['login']
         password = hex(request.POST['pass'])
+        email = request.POST['email']
+        pass2 = hex(request.POST['pass2'])
         print(request.POST)
-        login_iiko = request.POST['login_biz']
-        pass_iiko = request.POST['pass_biz']
-        token2 = isLoginBiz(login_iiko,pass_iiko)
         token = isLogin(server, login, password)
         print(token)
-        print(token2)
+        #print(token2)
         if token == '0':
-            return redirect('/reg')
-        elif token2 == '0':
             return redirect('/reg')
         else:
             table = db['user']
             row = table.find_one(id=server) 
             if row == None:
-                table.insert({'id':server, 'login':login, 'token':token, 'pass':password, 'token_biz':token2, 'login_biz':login_iiko, 'pass_biz':pass_iiko})
+                table.upsert({'id':server, 'login':login, 'token':token, 'pass':password, 'pass2':pass2, 'email':email}, ['id'])
                 table3 = db.create_table(server,
                          primary_id='date',
                          primary_type=db.types.string(35))
@@ -542,7 +541,7 @@ def graf_p(request):
 	vol1=[]
 	vol1.append(['Дата','Количество покупателей'])
 	#print([i for i in range(10, 1, -1)])
-	for i in range(10,0,-1):
+	for i in range(8,0,-1):
 		del_seven_days = now_p-timedelta(7*i)
 		del2_seven_days = now_p-timedelta(7*(i-1))
 		now_str = str(del2_seven_days.year)+'-'
@@ -572,7 +571,7 @@ def graf_p(request):
 	vol1=[]
 	vol1.append(['Дата','Количество проданнх офферов'])
 	print([i for i in range(8, 0, -1)])
-	for i in range(10,0,-1):
+	for i in range(8,0,-1):
 		del_seven_days = now_p-timedelta(7*i)
 		del2_seven_days = now_p-timedelta(7*(i-1))
 
@@ -603,7 +602,7 @@ def graf_p(request):
 	vol1=[]
 	vol1.append(['Дата','Количество клиентов'])
 	#print([i for i in range(8, 1, -1)])
-	for i in range(10,0,-1):
+	for i in range(8,0,-1):
 		del_seven_days = now_p-timedelta(7*i)
 		del2_seven_days = now_p
 		del3_seven_days = del_seven_days + timedelta(7)
